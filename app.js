@@ -1,9 +1,17 @@
 const fs = require('fs');
 const express = require('express');
+const morgan = require('morgan');
 
 const app = express();
 // Middleware to add the data from the body to the request object
+app.use(morgan('dev'));
 app.use(express.json());
+
+// create own middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} request at ${new Date().toISOString()}`);
+  next();
+});
 
 // create routes
 // read json file and parse it
@@ -12,6 +20,8 @@ const tours = JSON.parse(
 );
 
 // Route handlers
+
+//TOURS
 const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -25,7 +35,7 @@ const getAllTours = (req, res) => {
 const getTourById = (req, res) => {
   console.log(req.params);
   const id = req.params.id * 1; // Convert id from string to number
-  const tour = tours.find((tour) => tour.id === id);
+  const tour = tours.find(tour => tour.id === id);
 
   if (!tour) {
     return res.status(404).json({
@@ -49,7 +59,7 @@ const createTour = (req, res) => {
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
-    (err) => {
+    err => {
       res.status(201).json({
         status: 'success',
         data: {
@@ -64,7 +74,7 @@ const updateTour = (req, res) => {
   console.log(req.body);
 
   const id = req.params.id * 1; // Convert id from string to number
-  const tour = tours.find((tour) => tour.id === id);
+  const tour = tours.find(tour => tour.id === id);
 
   if (!tour) {
     return res.status(404).json({
@@ -73,7 +83,7 @@ const updateTour = (req, res) => {
     });
   }
 
-  const UpdatedTours = tours.map((tour) => {
+  const UpdatedTours = tours.map(tour => {
     if (tour.id === id) {
       console.log({ ...tour, ...req.body });
 
@@ -85,7 +95,7 @@ const updateTour = (req, res) => {
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(UpdatedTours),
-    (err) => {
+    err => {
       res.status(200).json({
         status: 'success',
         data: {
@@ -100,7 +110,7 @@ const deleteTour = (req, res) => {
   console.log(req.body);
 
   const id = req.params.id * 1; // Convert id from string to number
-  const tour = tours.find((tour) => tour.id === id);
+  const tour = tours.find(tour => tour.id === id);
 
   if (!tour) {
     return res.status(404).json({
@@ -109,18 +119,54 @@ const deleteTour = (req, res) => {
     });
   }
 
-  const UpdatedTours = tours.filter((tour) => tour.id !== id);
+  const UpdatedTours = tours.filter(tour => tour.id !== id);
 
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(UpdatedTours),
-    (err) => {
+    err => {
       res.status(204).json({
         status: 'success',
         data: null,
       });
     }
   );
+};
+
+// USERS
+const getAllUsers = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined',
+  });
+};
+
+const createUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined',
+  });
+};
+
+const getUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined',
+  });
+};
+
+const updateUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined',
+  });
+};
+
+const deleteUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined',
+  });
 };
 
 // create a get route to the tours endpoint
@@ -144,5 +190,14 @@ app
 
 //app.delete('/api/v1/tours/:id', deleteTour);
 
+app.route('/api/v1/users').get(getAllUsers).post(createUser);
+
+app
+  .route('/api/v1/users/:id')
+  .get(getUser)
+  .patch(updateUser)
+  .delete(deleteUser);
+
+// Start Server
 const PORT = 3000;
 app.listen(PORT, () => console.log(`App running on port ${PORT}`));
