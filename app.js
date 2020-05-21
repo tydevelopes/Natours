@@ -125,15 +125,24 @@ const deleteTour = (req, res) => {
 
 // create a get route to the tours endpoint
 // The json data will be sent using JSEND - A json formatting standard
-app.get('/api/v1/tours', getAllTours);
 
-app.get('/api/v1/tours/:id', getTourById);
+app.route('/api/v1/tours').get(getAllTours).post(createTour);
 
-app.post('/api/v1/tours', createTour);
+app
+  .route('/api/v1/tours/:id')
+  .get(getTourById)
+  .patch(updateTour)
+  .delete(deleteTour);
 
-app.patch('/api/v1/tours/:id', updateTour);
+//app.get('/api/v1/tours', getAllTours);
 
-app.delete('/api/v1/tours/:id', deleteTour);
+//app.get('/api/v1/tours/:id', getTourById);
+
+//app.post('/api/v1/tours', createTour);
+
+//app.patch('/api/v1/tours/:id', updateTour);
+
+//app.delete('/api/v1/tours/:id', deleteTour);
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`App running on port ${PORT}`));
