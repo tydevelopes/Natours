@@ -172,31 +172,21 @@ const deleteUser = (req, res) => {
 // create a get route to the tours endpoint
 // The json data will be sent using JSEND - A json formatting standard
 
-app.route('/api/v1/tours').get(getAllTours).post(createTour);
+// Express router
+const tourRouter = express.Router();
+const userRouter = express.Router();
 
-app
-  .route('/api/v1/tours/:id')
-  .get(getTourById)
-  .patch(updateTour)
-  .delete(deleteTour);
+tourRouter.route('/').get(getAllTours).post(createTour);
 
-//app.get('/api/v1/tours', getAllTours);
+tourRouter.route('/:id').get(getTourById).patch(updateTour).delete(deleteTour);
 
-//app.get('/api/v1/tours/:id', getTourById);
+userRouter.route('/').get(getAllUsers).post(createUser);
 
-//app.post('/api/v1/tours', createTour);
+userRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
 
-//app.patch('/api/v1/tours/:id', updateTour);
-
-//app.delete('/api/v1/tours/:id', deleteTour);
-
-app.route('/api/v1/users').get(getAllUsers).post(createUser);
-
-app
-  .route('/api/v1/users/:id')
-  .get(getUser)
-  .patch(updateUser)
-  .delete(deleteUser);
+// Mount routers
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
 // Start Server
 const PORT = 3000;
