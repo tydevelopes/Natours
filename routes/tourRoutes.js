@@ -4,11 +4,17 @@ const {
   getTourById,
   updateTour,
   deleteTour,
+  checkID,
+  checkBody,
 } = require('../controllers/tourController');
 
 const router = require('express').Router();
 
-router.route('/').get(getAllTours).post(createTour);
+// Parameter middleware
+router.param('id', checkID);
+
+// To use a middleware on a route, pass it as the first argument of the route
+router.route('/').get(getAllTours).post(checkBody, createTour);
 
 router.route('/:id').get(getTourById).patch(updateTour).delete(deleteTour);
 

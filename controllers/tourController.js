@@ -8,6 +8,35 @@ const tours = JSON.parse(
 // Route handlers
 // The json data will be sent using JSEND - A json formatting standard
 
+// Middleware to validate id. val holds the value of id
+exports.checkID = (req, res, next, val) => {
+  console.log('id: ', val);
+  const id = val * 1; // Convert id from string to number
+  const tour = tours.find(tour => tour.id === id);
+
+  if (!tour) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+  // Attach tour to the res object
+  res.tour = tour;
+  next();
+};
+
+// Middleware to check request body if it contains the name and price property
+exports.checkBody = (req, res, next) => {
+  if (!req.body.hasOwnProperty('name') || !req.body.hasOwnProperty('price')) {
+    return res.status(400).json({
+      status: 'failure',
+      message: 'Bad format, body should have name and price',
+    });
+  }
+
+  next();
+};
+
 //TOURS
 exports.getAllTours = (req, res) => {
   res.status(200).json({
@@ -20,20 +49,10 @@ exports.getAllTours = (req, res) => {
 };
 
 exports.getTourById = (req, res) => {
-  console.log(req.params);
-  const id = req.params.id * 1; // Convert id from string to number
-  const tour = tours.find(tour => tour.id === id);
-
-  if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
   res.status(200).json({
     status: 'success',
     data: {
-      tour,
+      tour: res.tour,
     },
   });
 };
@@ -44,7 +63,7 @@ exports.createTour = (req, res) => {
   tours.push(newTour);
 
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
     err => {
       res.status(201).json({
@@ -58,20 +77,8 @@ exports.createTour = (req, res) => {
 };
 
 exports.updateTour = (req, res) => {
-  console.log(req.body);
-
-  const id = req.params.id * 1; // Convert id from string to number
-  const tour = tours.find(tour => tour.id === id);
-
-  if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
-
   const UpdatedTours = tours.map(tour => {
-    if (tour.id === id) {
+    if (tour.id === req.params.id) {
       console.log({ ...tour, ...req.body });
 
       return { ...tour, ...req.body };
@@ -80,7 +87,7 @@ exports.updateTour = (req, res) => {
   });
 
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(UpdatedTours),
     err => {
       res.status(200).json({
@@ -94,22 +101,10 @@ exports.updateTour = (req, res) => {
 };
 
 exports.deleteTour = (req, res) => {
-  console.log(req.body);
-
-  const id = req.params.id * 1; // Convert id from string to number
-  const tour = tours.find(tour => tour.id === id);
-
-  if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
-
-  const UpdatedTours = tours.filter(tour => tour.id !== id);
+  const UpdatedTours = tours.filter(tour => tour.id !== req.params.id);
 
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(UpdatedTours),
     err => {
       res.status(204).json({
