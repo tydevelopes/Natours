@@ -7,4 +7,4 @@
 
 #sensitive
 .env
-config.env
+/config.env
